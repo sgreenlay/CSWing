@@ -26,6 +26,16 @@ namespace CSWing
                 return;
             }
 
+            var status = await gmApi.GetLevelStatus(instanceId);
+
+            if (!status)
+            {
+                Console.WriteLine("Couldn't get status of instance {0}", instanceId);
+                Console.ReadKey();
+
+                return;
+            }
+
             var resumed = await gmApi.DoLevelOperation(instanceId, "resume");
 
             if (!resumed)
@@ -59,24 +69,37 @@ namespace CSWing
                 return;
             }
 
-            var isTestExOnline = await api.IsVenueOnline("TESTEX");
+            var account = "EXB123456";
 
-            if (!isTestExOnline)
+            var exchange = "TESTEX";
+            var stock = "FOOBAR";
+
+            var quantity = 10000;
+            var price = 2000;
+
+            var isExchangeOnline = await api.IsVenueOnline(exchange);
+
+            if (!isExchangeOnline)
             {
-                Console.WriteLine("TESTEX is offline");
+                Console.WriteLine("Exchange is offline");
                 Console.ReadKey();
 
                 return;
             }
 
-            var testExStockList = await api.GetStockList("TESTEX");
+            var stockList = await api.GetStockList(exchange);
 
-            foreach (var symbol in testExStockList)
+            foreach (var symbol in stockList)
             {
                 Console.WriteLine("[{0}] {1}", symbol.Symbol, symbol.Name);
             }
 
-            Console.ReadKey();
+            for (var i = 0; i < 10; ++i)
+            {
+                var order = await api.PlaceOrder(account, exchange, stock, price, quantity, "buy", "market");
+
+                Console.WriteLine("{0} shares of {1} purchased for {2}", order.Quantity, stock, order.Price);
+            }
         }
     }
 }

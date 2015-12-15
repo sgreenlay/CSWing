@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -132,6 +133,97 @@ namespace CSWing.Stockfighter.Api
             // TODO
 
             return;
+        }
+
+        class OrderQuery
+        {
+            public string Account { get; set; }
+
+            public string Venue { get; set; }
+            public string Stock { get; set; }
+
+            public int Price { get; set; }
+            public int Qty { get; set; }
+
+            public string Direction { get; set; }
+
+            public string OrderType { get; set; }
+        }
+
+        class OrderResponse : Response
+        {
+            public int Id { get; set; }
+            public string Account { get; set; }
+
+            public string Venue { get; set; }
+            public string Symbol { get; set; }
+
+            public string Direction { get; set; }
+
+            public int OriginalQty { get; set; }
+            public int Qty { get; set; }
+
+            public int Price { get; set; }
+            public string Type { get; set; }
+
+            public class Fill
+            {
+                public int Price { get; set; }
+                public int Qty { get; set; }
+                public DateTime Ts { get; set; }
+            }
+
+            public IList<Fill> Fills { get; set; }
+            public DateTime Ts { get; set; }
+        }
+
+        public class Order
+        {
+            public int Price { get; set; }
+            public int Quantity { get; set; }
+        }
+
+        public async Task<Order> PlaceOrder(
+            string account,
+            string venue,
+            string symbol,
+            int price,
+            int qty,
+            string direction,
+            string ordertype)
+        {
+            var query = new OrderQuery();
+
+            query.Account = account;
+            query.Venue = venue;
+            query.Stock = symbol;
+            query.Price = price;
+            query.Qty = qty;
+            query.Direction = direction;
+            query.OrderType = ordertype;
+
+            var settings = new JsonSerializerSettings();
+            settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+
+            var jsonQuery = JsonConvert.SerializeObject(query, Formatting.Indented, settings);
+            var content = new StringContent(jsonQuery, Encoding.UTF8, "application/json");
+
+            var res = await httpClient.PostAsync(string.Format("venues/{0}/stocks/{1}/orders", venue, symbol), content);
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return new Order { Price = 0, Quantity = 0 };
+            }
+
+            var jsonResponse = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<OrderResponse>(jsonResponse);
+
+            if (!data.Ok)
+            {
+                return new Order { Price = 0, Quantity = 0 };
+            }
+
+            return new Order { Price = data.Price, Quantity = data.OriginalQty - data.Qty };
         }
     }
 }

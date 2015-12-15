@@ -25,7 +25,29 @@ namespace CSWing.Stockfighter.Api
             public bool Ok { get; set; }
         }
 
-        class LevelResponse : Response
+        public async Task<int> GetLevels()
+        {
+            var res = await httpClient.GetAsync("levels");
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return 0;
+            }
+
+            var json = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<Response>(json);
+
+            if (!data.Ok)
+            {
+                return 0;
+            }
+
+            // TODO
+
+            return 0;
+        }
+
+        class LevelCreationResponse : Response
         {
             public string Account { get; set; }
             public int InstanceId { get; set; }
@@ -51,7 +73,7 @@ namespace CSWing.Stockfighter.Api
             }
 
             var json = await res.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<LevelResponse>(json);
+            var data = JsonConvert.DeserializeObject<LevelCreationResponse>(json);
 
             if (!data.Ok)
             {
@@ -59,6 +81,42 @@ namespace CSWing.Stockfighter.Api
             }
 
             return data.InstanceId;
+        }
+
+        class LevelStatusResponse : Response
+        {
+            public class LevelStatusDetails
+            {
+                public int EndOfWorldDay { get; set; }
+                public int TradingDay { get; set; }
+            }
+
+            public LevelStatusDetails Details { get; set; }
+            public bool Done { get; set; }
+            public int Id { get; set; }
+            public string State { get; set; }
+        }
+
+        public async Task<bool> GetLevelStatus(int instanceId)
+        {
+            var res = await httpClient.GetAsync(string.Format("instances/{0}", instanceId));
+
+            if (!res.IsSuccessStatusCode)
+            {
+                return false;
+            }
+
+            var json = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<LevelStatusResponse>(json);
+
+            if (!data.Ok)
+            {
+                return false;
+            }
+
+            // TODO
+
+            return true;
         }
 
         class LevelOperationResponse : Response
