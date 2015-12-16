@@ -37,7 +37,7 @@ namespace CSWing.Stockfighter.Api
 
             if (!res.IsSuccessStatusCode)
             {
-                return false;
+                throw new Exception("Failed to connect to server");
             }
 
             var json = await res.Content.ReadAsStringAsync();
@@ -57,7 +57,7 @@ namespace CSWing.Stockfighter.Api
 
             if (!res.IsSuccessStatusCode)
             {
-                return false;
+                throw new Exception("Failed to connect to server");
             }
 
             var json = await res.Content.ReadAsStringAsync();
@@ -91,10 +91,23 @@ namespace CSWing.Stockfighter.Api
 
             if (!data.Ok)
             {
-                return null;
+                throw new Exception("Failed to execute command");
             }
 
             return data.Symbols;
+        }
+
+        public class Bid
+        {
+            public int Price { get; set; }
+            public int Qty { get; set; }
+            public bool IsBuy { get; set; }
+        }
+
+        public class Book
+        {
+            public IList<Bid> Bids { get; set; }
+            public IList<Bid> Asks { get; set; }
         }
 
         class OrderbookResponse : Response
@@ -102,24 +115,19 @@ namespace CSWing.Stockfighter.Api
             public string Venue { get; set; }
             public string Symbol { get; set; }
 
-            public class Bid
-            {
-                public int Price { get; set; }
-                public int Qty { get; set; }
-                public bool IsBuy { get; set; }
-            }
-
             public IList<Bid> Bids { get; set; }
+            public IList<Bid> Asks { get; set; }
+
             public DateTime Ts { get; set; }
         }
 
-        public async Task GetOrderBook(string venue, string symbol)
+        public async Task<Book> GetOrderBook(string venue, string symbol)
         {
             var res = await httpClient.GetAsync(string.Format("venues/{0}/stocks/{1}", venue, symbol));
 
             if (!res.IsSuccessStatusCode)
             {
-                return;
+                throw new Exception("Failed to connect to server");
             }
 
             var json = await res.Content.ReadAsStringAsync();
@@ -127,12 +135,10 @@ namespace CSWing.Stockfighter.Api
 
             if (!data.Ok)
             {
-                return;
+                throw new Exception("Failed to execute command");
             }
 
-            // TODO
-
-            return;
+            return new Book { Bids = data.Bids, Asks = data.Asks };
         }
 
         class OrderQuery
@@ -175,6 +181,8 @@ namespace CSWing.Stockfighter.Api
 
             public IList<Fill> Fills { get; set; }
             public DateTime Ts { get; set; }
+
+            public int TotalFilled { get; set; }
         }
 
         public class Order
@@ -212,7 +220,7 @@ namespace CSWing.Stockfighter.Api
 
             if (!res.IsSuccessStatusCode)
             {
-                return new Order { Price = 0, Quantity = 0 };
+                throw new Exception("Failed to connect to server");
             }
 
             var jsonResponse = await res.Content.ReadAsStringAsync();
@@ -220,10 +228,10 @@ namespace CSWing.Stockfighter.Api
 
             if (!data.Ok)
             {
-                return new Order { Price = 0, Quantity = 0 };
+                throw new Exception("Failed to execute command");
             }
 
-            return new Order { Price = data.Price, Quantity = data.OriginalQty - data.Qty };
+            return new Order { Price = data.Price, Quantity = data.TotalFilled };
         }
     }
 }
