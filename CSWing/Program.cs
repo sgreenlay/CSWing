@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            ChockABlock.RunAsync(args[0]).Wait();
+            SellSide.RunAsync(args[0]).Wait();
         }
     }
 }

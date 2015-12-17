@@ -190,6 +190,7 @@ namespace CSWing.Stockfighter.Api
             public int Id { get; set; }
             public int Price { get; set; }
             public int Quantity { get; set; }
+            public int Outstanding { get; set; }
         }
 
         public async Task<Order> PlaceOrder(
@@ -232,7 +233,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
         }
 
         public async Task<Order> GetOrderStatus(
@@ -255,7 +256,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
         }
 
         public async Task<Order> CancelOrder(
@@ -278,7 +279,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
         }
     }
 }
