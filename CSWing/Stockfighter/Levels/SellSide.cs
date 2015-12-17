@@ -25,10 +25,10 @@ namespace CSWing
                 return;
             }
 
-            var account = "GSS65340046";
+            var account = "FTB86870656";
 
-            var exchange = "TVEX";
-            var stock = "MDS";
+            var exchange = "TEOEX";
+            var stock = "SDH";
 
             var isExchangeOnline = await api.IsVenueOnline(exchange);
 
@@ -61,19 +61,21 @@ namespace CSWing
                     runningBuyingPrice.Enqueue(book.Bids[0].Price);
                 }
 
-                Thread.Sleep(500);
+                Thread.Sleep(50);
             }
 
-            int profit = 0;
-            int desiredProfit = 10000;
+            int totalCash = 0;
+            int desiredProfit = 1000000;
 
             int maxShares = 1000;
             int totalShares = 0;
 
             Portfolio portfolio = new Portfolio();
 
-            while (profit < desiredProfit)
+            while (totalCash < desiredProfit)
             {
+                var quote = await api.GetStockQuote(exchange, stock);
+
                 var book = await api.GetOrderBook(exchange, stock);
 
                 if (book == null)
@@ -99,10 +101,22 @@ namespace CSWing
                             "sell",
                             "immediate-or-cancel");
 
-                        Console.WriteLine("{0} shares of {1} sold for {2}", order.Quantity, stock, order.Price);
+                        Console.WriteLine("{0} shares of {1} sold @ {2:C2}",
+                            order.Quantity,
+                            stock,
+                            (float)order.Price / 100.0f);
 
-                        portfolio.RemovePositions(stock, order.Quantity);
+                        portfolio.RemovePositions(stock, order.Quantity, order.Price);
+
                         totalShares -= order.Quantity;
+                        totalCash += order.Quantity * order.Price;
+
+                        Console.WriteLine("{0:C2} cash, {1} @ {2:C2} = {3:C2} stock, {4:C2} total",
+                            (float)totalCash / 100.0f,
+                            totalShares,
+                            (float)quote.Last / 100.0f,
+                            (float)(quote.Last * totalShares) / 100.0f,
+                            (float)(totalCash + quote.Last * totalShares) / 100.0f);
                     }
                 }
 
@@ -119,14 +133,26 @@ namespace CSWing
                            "buy",
                            "immediate-or-cancel");
 
-                        Console.WriteLine("{0} shares of {1} purchased for {2}", order.Quantity, stock, order.Price);
+                        Console.WriteLine("{0} shares of {1} purchased @ {2:C2}",
+                            order.Quantity,
+                            stock,
+                            (float)order.Price / 100.0f);
 
-                        portfolio.AddPositions(stock, order.Price, order.Quantity);
+                        portfolio.AddPositions(stock, order.Quantity, order.Price);
+
                         totalShares += order.Quantity;
+                        totalCash -= order.Quantity * order.Price;
+
+                        Console.WriteLine("{0:C2} cash, {1} @ {2:C2} = {3:C2} stock, {4:C2} total",
+                            (float)totalCash / 100.0f,
+                            totalShares,
+                            (float)quote.Last / 100.0f,
+                            (float)(quote.Last * totalShares) / 100.0f,
+                            (float)(totalCash + quote.Last * totalShares) / 100.0f);
                     }
                 }
 
-                Thread.Sleep(500);
+                Thread.Sleep(50);
             }
         }
     }

@@ -24,8 +24,8 @@ namespace CSWing.Stockfighter.Helpers
 
         public void AddPositions(
             string symbol,
-            int purchasePrice,
-            int quantity)
+            int quantity,
+            int purchasePrice)
         {
             if (!positionsHeld.ContainsKey(symbol))
             {
@@ -85,7 +85,8 @@ namespace CSWing.Stockfighter.Helpers
 
         public void RemovePositions(
             string symbol,
-            int quantity)
+            int quantity,
+            int salePrice)
         {
             if (!positionsHeld.ContainsKey(symbol))
             {
@@ -101,6 +102,7 @@ namespace CSWing.Stockfighter.Helpers
                 if (priceAndQuantity.Quantity > quantity)
                 {
                     priceAndQuantity.Quantity -= quantity;
+
                     return;
                 }
                 else

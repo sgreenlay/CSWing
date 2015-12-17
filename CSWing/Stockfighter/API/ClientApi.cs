@@ -83,7 +83,7 @@ namespace CSWing.Stockfighter.Api
 
             if (!res.IsSuccessStatusCode)
             {
-                return null;
+                throw new Exception("Failed to connect to server");
             }
 
             var json = await res.Content.ReadAsStringAsync();
@@ -95,6 +95,55 @@ namespace CSWing.Stockfighter.Api
             }
 
             return data.Symbols;
+        }
+
+        public class StockQuote
+        {
+            public int Ask { get; set; }
+            public int Bid { get; set; }
+            public int Last { get; set; }
+        }
+
+        class StockQuoteResponse : Response
+        {
+            public string Symbol { get; set; }
+            public string Venue { get; set; }
+
+            public int Bid { get; set; }
+            public int BidSize { get; set; }
+            public int BidDepth { get; set; }
+
+            public int Ask { get; set; }
+            public int AskSize { get; set; }
+            public int AskDepth { get; set; }
+
+            public int Last { get; set; }
+            public int LastSize { get; set; }
+            public DateTime LastTrade { get; set; }
+
+            public DateTime QuoteTime { get; set; }
+        }
+
+        public async Task<StockQuote> GetStockQuote(
+            string venue,
+            string symbol)
+        {
+            var res = await httpClient.GetAsync(string.Format("venues/{0}/stocks/{1}/quote", venue, symbol));
+
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to connect to server");
+            }
+
+            var json = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<StockQuoteResponse>(json);
+
+            if (!data.Ok)
+            {
+                throw new Exception("Failed to execute command");
+            }
+
+            return new StockQuote { Ask = data.Ask, Bid = data.Bid, Last = data.Last };
         }
 
         public class Bid
