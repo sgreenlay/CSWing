@@ -25,10 +25,10 @@ namespace CSWing
                 return;
             }
 
-            var account = "FTB86870656";
+            var account = "TPB77289763";
 
-            var exchange = "TEOEX";
-            var stock = "SDH";
+            var exchange = "OTUOEX";
+            var stock = "RLH";
 
             var isExchangeOnline = await api.IsVenueOnline(exchange);
 
@@ -65,6 +65,7 @@ namespace CSWing
             }
 
             int totalCash = 0;
+            int totalValue = 0;
             int desiredProfit = 1000000;
 
             int maxShares = 1000;
@@ -72,10 +73,11 @@ namespace CSWing
 
             Portfolio portfolio = new Portfolio();
 
-            while (totalCash < desiredProfit)
+            do
             {
-                var quote = await api.GetStockQuote(exchange, stock);
+                Thread.Sleep(50);
 
+                var quote = await api.GetStockQuote(exchange, stock);
                 var book = await api.GetOrderBook(exchange, stock);
 
                 if (book == null)
@@ -152,8 +154,9 @@ namespace CSWing
                     }
                 }
 
-                Thread.Sleep(50);
-            }
+                totalValue = totalCash + quote.Last * totalShares;
+
+            } while (totalValue < desiredProfit);
         }
     }
 }
