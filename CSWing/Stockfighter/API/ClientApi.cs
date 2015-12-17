@@ -50,7 +50,7 @@ namespace CSWing.Stockfighter.Api
         {
             public string Venue { get; set; }
         }
-        
+
         public async Task<bool> IsVenueOnline(string venue)
         {
             var res = await httpClient.GetAsync(string.Format("venues/{0}/heartbeat", venue));
@@ -187,6 +187,7 @@ namespace CSWing.Stockfighter.Api
 
         public class Order
         {
+            public int Id { get; set; }
             public int Price { get; set; }
             public int Quantity { get; set; }
         }
@@ -231,7 +232,53 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Price = data.Price, Quantity = data.TotalFilled };
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
+        }
+
+        public async Task<Order> GetOrderStatus(
+            string venue,
+            string symbol,
+            int id)
+        {
+            var res = await httpClient.GetAsync(string.Format("venues/{0}/stocks/{1}/orders/{2}", venue, symbol, id));
+
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to connect to server");
+            }
+
+            var jsonResponse = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<OrderResponse>(jsonResponse);
+
+            if (!data.Ok)
+            {
+                throw new Exception("Failed to execute command");
+            }
+
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
+        }
+
+        public async Task<Order> CancelOrder(
+            string venue,
+            string symbol,
+            int id)
+        {
+            var res = await httpClient.DeleteAsync(string.Format("venues/{0}/stocks/{1}/orders/{2}", venue, symbol, id));
+
+            if (!res.IsSuccessStatusCode)
+            {
+                throw new Exception("Failed to connect to server");
+            }
+
+            var jsonResponse = await res.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<OrderResponse>(jsonResponse);
+
+            if (!data.Ok)
+            {
+                throw new Exception("Failed to execute command");
+            }
+
+            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled };
         }
     }
 }

@@ -23,10 +23,10 @@ namespace CSWing
                 return;
             }
 
-            var account = "MFB70486931";
+            var account = "FTB64831451";
 
-            var exchange = "UHOEX";
-            var stock = "AREC";
+            var exchange = "LUWMEX";
+            var stock = "KFI";
 
             var isExchangeOnline = await api.IsVenueOnline(exchange);
 
@@ -47,11 +47,13 @@ namespace CSWing
                     runningLowestCost.Enqueue(book.Asks[0].Price);
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
 
             var totalQuantity = 100000;
             var acquiredStock = 0;
+
+            var outstandingOrder = 0;
 
             while (acquiredStock < totalQuantity)
             {
@@ -59,8 +61,26 @@ namespace CSWing
 
                 if (book != null && book.Asks != null)
                 {
-                    runningLowestCost.Dequeue();
-                    runningLowestCost.Enqueue(book.Asks[0].Price);
+                    if (outstandingOrder != 0)
+                    {
+                        var order = await api.GetOrderStatus(exchange, stock, outstandingOrder);
+
+                        if (order.Price > runningLowestCost.Min() || order.Quantity >= (totalQuantity / 10))
+                        {
+                            order = await api.CancelOrder(exchange, stock, outstandingOrder);
+
+                            if (order.Quantity > 0)
+                            {
+                                Console.WriteLine("{0} shares of {1} purchased for {2}", order.Quantity, stock, order.Price);
+
+                                acquiredStock += order.Quantity;
+
+                                Console.WriteLine("{0} total shares of {1} acquired", acquiredStock, stock);
+                            }
+
+                            outstandingOrder = 0;
+                        }
+                    }
 
                     if (book.Asks[0].Price <= runningLowestCost.Min())
                     {
@@ -79,9 +99,26 @@ namespace CSWing
 
                         Console.WriteLine("{0} total shares of {1} acquired", acquiredStock, stock);
                     }
+
+                    runningLowestCost.Dequeue();
+                    runningLowestCost.Enqueue(book.Asks[0].Price);
+
+                    if (outstandingOrder == 0)
+                    {
+                        var order = await api.PlaceOrder(
+                            account,
+                            exchange,
+                            stock,
+                            runningLowestCost.Min(),
+                            (totalQuantity / 10),
+                            "buy",
+                            "limit");
+
+                        outstandingOrder = order.Id;
+                    }
                 }
 
-                Thread.Sleep(1000);
+                Thread.Sleep(500);
             }
         }
     }
