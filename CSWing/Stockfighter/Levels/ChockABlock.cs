@@ -65,15 +65,15 @@ namespace CSWing
                     {
                         var order = await api.GetOrderStatus(exchange, stock, outstandingOrder);
 
-                        if (order.Price > runningLowestCost.Min() || order.Quantity >= (totalQuantity / 10))
+                        if (order.Price > runningLowestCost.Min() || order.TotalFilled >= (totalQuantity / 10))
                         {
                             order = await api.CancelOrder(exchange, stock, outstandingOrder);
 
-                            if (order.Quantity > 0)
+                            if (order.TotalFilled > 0)
                             {
-                                Console.WriteLine("{0} shares of {1} purchased for {2}", order.Quantity, stock, order.Price);
+                                Console.WriteLine("{0} shares of {1} purchased for {2}", order.TotalFilled, stock, order.Price);
 
-                                acquiredStock += order.Quantity;
+                                acquiredStock += order.TotalFilled;
 
                                 Console.WriteLine("{0} total shares of {1} acquired", acquiredStock, stock);
                             }
@@ -93,9 +93,9 @@ namespace CSWing
                             "buy",
                             "immediate-or-cancel");
 
-                        Console.WriteLine("{0} shares of {1} purchased for {2}", order.Quantity, stock, order.Price);
+                        Console.WriteLine("{0} shares of {1} purchased for {2}", order.TotalFilled, stock, order.Price);
 
-                        acquiredStock += order.Quantity;
+                        acquiredStock += order.TotalFilled;
 
                         Console.WriteLine("{0} total shares of {1} acquired", acquiredStock, stock);
                     }

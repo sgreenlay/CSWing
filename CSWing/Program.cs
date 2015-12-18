@@ -4,7 +4,7 @@
     {
         static void Main(string[] args)
         {
-            SellSide.RunAsync(args[0]).Wait();
+            Logger.RunAsync(args[0]).Wait();
         }
     }
 }

@@ -21,7 +21,7 @@ namespace CSWing.Stockfighter.Api
             httpClient.DefaultRequestHeaders.Add("X-Stockfighter-Authorization", authToken);
         }
 
-        class Response
+        public class Response
         {
             public bool Ok { get; set; }
         }
@@ -97,14 +97,7 @@ namespace CSWing.Stockfighter.Api
             return data.Symbols;
         }
 
-        public class StockQuote
-        {
-            public int Ask { get; set; }
-            public int Bid { get; set; }
-            public int Last { get; set; }
-        }
-
-        class StockQuoteResponse : Response
+        public class StockQuoteResponse : Response
         {
             public string Symbol { get; set; }
             public string Venue { get; set; }
@@ -124,7 +117,7 @@ namespace CSWing.Stockfighter.Api
             public DateTime QuoteTime { get; set; }
         }
 
-        public async Task<StockQuote> GetStockQuote(
+        public async Task<StockQuoteResponse> GetStockQuote(
             string venue,
             string symbol)
         {
@@ -143,7 +136,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new StockQuote { Ask = data.Ask, Bid = data.Bid, Last = data.Last };
+            return data;
         }
 
         public class Bid
@@ -153,13 +146,7 @@ namespace CSWing.Stockfighter.Api
             public bool IsBuy { get; set; }
         }
 
-        public class Book
-        {
-            public IList<Bid> Bids { get; set; }
-            public IList<Bid> Asks { get; set; }
-        }
-
-        class OrderbookResponse : Response
+        public class OrderbookResponse : Response
         {
             public string Venue { get; set; }
             public string Symbol { get; set; }
@@ -170,7 +157,7 @@ namespace CSWing.Stockfighter.Api
             public DateTime Ts { get; set; }
         }
 
-        public async Task<Book> GetOrderBook(string venue, string symbol)
+        public async Task<OrderbookResponse> GetOrderBook(string venue, string symbol)
         {
             var res = await httpClient.GetAsync(string.Format("venues/{0}/stocks/{1}", venue, symbol));
 
@@ -187,7 +174,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Book { Bids = data.Bids, Asks = data.Asks };
+            return data;
         }
 
         class OrderQuery
@@ -205,7 +192,7 @@ namespace CSWing.Stockfighter.Api
             public string OrderType { get; set; }
         }
 
-        class OrderResponse : Response
+        public class OrderResponse : Response
         {
             public int Id { get; set; }
             public string Account { get; set; }
@@ -234,15 +221,7 @@ namespace CSWing.Stockfighter.Api
             public int TotalFilled { get; set; }
         }
 
-        public class Order
-        {
-            public int Id { get; set; }
-            public int Price { get; set; }
-            public int Quantity { get; set; }
-            public int Outstanding { get; set; }
-        }
-
-        public async Task<Order> PlaceOrder(
+        public async Task<OrderResponse> PlaceOrder(
             string account,
             string venue,
             string symbol,
@@ -282,10 +261,10 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
+            return data;
         }
 
-        public async Task<Order> GetOrderStatus(
+        public async Task<OrderResponse> GetOrderStatus(
             string venue,
             string symbol,
             int id)
@@ -305,10 +284,10 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
+            return data;
         }
 
-        public async Task<Order> CancelOrder(
+        public async Task<OrderResponse> CancelOrder(
             string venue,
             string symbol,
             int id)
@@ -328,7 +307,7 @@ namespace CSWing.Stockfighter.Api
                 throw new Exception("Failed to execute command");
             }
 
-            return new Order { Id = data.Id, Price = data.Price, Quantity = data.TotalFilled, Outstanding = data.Qty };
+            return data;
         }
     }
 }

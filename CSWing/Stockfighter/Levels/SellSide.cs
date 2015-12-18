@@ -104,14 +104,14 @@ namespace CSWing
                             "immediate-or-cancel");
 
                         Console.WriteLine("{0} shares of {1} sold @ {2:C2}",
-                            order.Quantity,
+                            order.TotalFilled,
                             stock,
                             (float)order.Price / 100.0f);
 
-                        portfolio.RemovePositions(stock, order.Quantity, order.Price);
+                        portfolio.RemovePositions(stock, order.TotalFilled, order.Price);
 
-                        totalShares -= order.Quantity;
-                        totalCash += order.Quantity * order.Price;
+                        totalShares -= order.TotalFilled;
+                        totalCash += order.TotalFilled * order.Price;
 
                         Console.WriteLine("{0:C2} cash, {1} @ {2:C2} = {3:C2} stock, {4:C2} total",
                             (float)totalCash / 100.0f,
@@ -136,14 +136,14 @@ namespace CSWing
                            "immediate-or-cancel");
 
                         Console.WriteLine("{0} shares of {1} purchased @ {2:C2}",
-                            order.Quantity,
+                            order.TotalFilled,
                             stock,
                             (float)order.Price / 100.0f);
 
-                        portfolio.AddPositions(stock, order.Quantity, order.Price);
+                        portfolio.AddPositions(stock, order.TotalFilled, order.Price);
 
-                        totalShares += order.Quantity;
-                        totalCash -= order.Quantity * order.Price;
+                        totalShares += order.TotalFilled;
+                        totalCash -= order.TotalFilled * order.Price;
 
                         Console.WriteLine("{0:C2} cash, {1} @ {2:C2} = {3:C2} stock, {4:C2} total",
                             (float)totalCash / 100.0f,
