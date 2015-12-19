@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-using CSWing.Stockfighter.Helpers;
+using CSWing.Helpers;
 
 namespace CSWing
 {

@@ -1,16 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
-using CSWing.Stockfighter.Helpers;
 using System.IO;
 using Newtonsoft.Json;
-using System.Globalization;
 
-namespace CSWing
+namespace CSWing.Helpers
 {
     class Logger
     {
@@ -28,10 +22,10 @@ namespace CSWing
                 return;
             }
 
-            var account = "HMY20554992";
+            var account = "YMS99170543";
 
-            var exchange = "AUZKEX";
-            var stock = "VUZU";
+            var exchange = "NTIBEX";
+            var stock = "FRI";
 
             var isExchangeOnline = await api.IsVenueOnline(exchange);
 

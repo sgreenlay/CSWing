@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CSWing.Stockfighter.Helpers
+namespace CSWing.Helpers
 {
     class Portfolio
     {
