@@ -90,6 +90,7 @@
   <ItemGroup>
     <!-- A reference to the entire .Net Framework and Windows SDK are automatically included -->
     <None Include="project.json" />
+    <Content Include="Resources\lvl4 2015-12-18 09-03-44.json" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
