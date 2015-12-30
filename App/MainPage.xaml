@@ -5,10 +5,10 @@
     xmlns:local="using:App"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:canvas="using:Microsoft.Graphics.Canvas.UI.Xaml"
+    xmlns:controls="using:App.Controls"
     mc:Ignorable="d">
 
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <canvas:CanvasControl x:Name="HistoryGraph" Draw="Redraw" ClearColor="White" />
+        <controls:StockChart x:Name="Chart" />
     </Grid>
 </Page>
